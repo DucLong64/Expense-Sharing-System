@@ -1,228 +1,221 @@
-## **Hệ thống Quản lý Chi tiêu Chung (Expense Sharing System)** 
+# Hệ thống Quản lý Chi tiêu Chung (Expense Sharing System)
 
-Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm như nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch. 
+> Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm như nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch.
 
-## **Giới thiệu** 
+---
 
-Trong quá trình sinh hoạt chung, các thành viên thường xuyên phát sinh nhiều khoản chi như: 
+# 📖 Giới thiệu
 
-- Tiền điện 
+Trong quá trình sinh hoạt chung, các thành viên thường xuyên phát sinh nhiều khoản chi như:
 
-- Tiền nước 
+* Tiền điện
+* Tiền nước
+* Tiền Internet
+* Tiền thuê nhà
+* Mua đồ dùng chung
+* Ăn uống
+* Các khoản phát sinh khác
 
-- Tiền Internet 
+Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ dẫn đến nhầm lẫn, thất lạc hoặc tranh cãi.
 
-- Tiền thuê nhà 
+Dự án này được xây dựng nhằm giúp:
 
-- Mua đồ dùng chung 
+* Quản lý các khoản chi một cách minh bạch.
+* Theo dõi công nợ giữa các thành viên.
+* Tự động tính toán số tiền mỗi người phải trả.
+* Hỗ trợ phân quyền người dùng.
+* Dễ dàng mở rộng thành một nền tảng quản lý tài chính nhóm trong tương lai.
 
-- Ăn uống 
+---
 
-- Các khoản phát sinh khác 
+# 🎯 Mục tiêu
 
-Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ dẫn đến nhầm lẫn, thất lạc hoặc tranh cãi. 
+* Xây dựng hệ thống theo kiến trúc dễ mở rộng.
+* Áp dụng các best practice của Spring Boot.
+* Phù hợp triển khai thực tế bằng Docker và Kubernetes.
+* Là dự án phục vụ học tập và xây dựng Portfolio Backend Java.
 
-Dự án này được xây dựng nhằm giúp: 
+---
 
-- Quản lý các khoản chi một cách minh bạch. 
+# ✨ Chức năng
 
-- Theo dõi công nợ giữa các thành viên. 
+## 1. Quản lý tài khoản
 
-- Tự động tính toán số tiền mỗi người phải trả. 
+* Đăng ký
+* Đăng nhập
+* Đổi mật khẩu
+* JWT Authentication
+* Refresh Token
 
-- Hỗ trợ phân quyền người dùng. 
+---
 
-- Dễ dàng mở rộng thành một nền tảng quản lý tài chính nhóm trong tương lai. 
+## 2. Quản lý nhóm
 
-- 
+Một người dùng có thể tham gia nhiều nhóm khác nhau.
 
-## © **Mục tiêu** 
+Ví dụ:
 
-- Xây dựng hệ thống theo kiến trúc dễ mở rộng. 
+```text
+🏠 Phòng trọ Duy Tân
 
-- Áp dụng các best practice của Spring Boot. 
+🏠 Gia đình
 
-- Phù hợp triển khai thực tế bằng Docker và Kubernetes. 
+🏠 Du lịch Đà Nẵng
 
-- Là dự án phục vụ học tập và xây dựng Portfolio Backend Java. 
-
-## **Chức năng** 
-
-## **1. Quản lý tài khoản** 
-
-- Đăng ký 
-
-- Đăng nhập 
-
-- Đổi mật khẩu 
-
-• JWT Authentication • Refresh Token 
-
-## **2. Quản lý nhóm** 
-
-Một người dùng có thể tham gia nhiều nhóm khác nhau. 
-
-Ví dụ: 
-
-```
- Phòng trọ Duy Tân
- Gia đình
+🏠 Team Company
 ```
 
-```
- Du lịch Đà Nẵng
-```
+Chức năng:
 
-```
- Team Company
-```
+* Tạo nhóm
+* Chỉnh sửa thông tin nhóm
+* Mời thành viên
+* Rời nhóm
+* Xóa nhóm
 
-Chức năng: 
+---
 
-- Tạo nhóm • Chỉnh sửa thông tin nhóm • Mời thành viên • Rời nhóm • Xóa nhóm 
+## 3. Quản lý thành viên
 
-## **3. Quản lý thành viên** 
+Các quyền mặc định:
 
-Các quyền mặc định: 
+| Vai trò | Quyền                                |
+| ------- | ------------------------------------ |
+| OWNER   | Toàn quyền                           |
+| ADMIN   | Quản lý thành viên và khoản chi      |
+| MEMBER  | Thêm và chỉnh sửa khoản chi của mình |
+| VIEWER  | Chỉ được xem                         |
 
-|Vai trò|Quyền|
-|---|---|
-|OWNER|Toàn quyền|
-|ADMIN|Quản lý thành viên và khoản chi|
-|MEMBER|Thêm và chỉnh sửa khoản chi của mình|
-|VIEWER|Chỉ được xem|
+Trong tương lai có thể mở rộng thành hệ thống RBAC.
 
+---
 
+## 4. Quản lý khoản chi
 
-Trong tương lai có thể mở rộng thành hệ thống RBAC. 
+Mỗi khoản chi gồm:
 
-## **4. Quản lý khoản chi** 
+* Tiêu đề
+* Mô tả
+* Số tiền
+* Người thanh toán
+* Danh sách người tham gia
+* Ngày phát sinh
+* Ghi chú
+* Hóa đơn (phiên bản sau)
 
-Mỗi khoản chi gồm: 
+Ví dụ:
 
-- Tiêu đề 
+* Tiền điện tháng 7
+* Tiền Internet
+* Mua gạo
+* Ăn lẩu
+* Mua nước uống
 
-- Mô tả • Số tiền • Người thanh toán • Danh sách người tham gia 
+---
 
-- Ngày phát sinh 
+## 5. Chia chi phí
 
-- Ghi chú 
+Hệ thống hỗ trợ nhiều cách chia tiền.
 
-- Hóa đơn (phiên bản sau) 
+### Chia đều
 
-Ví dụ: 
+Ví dụ:
 
-- Tiền điện tháng 7 • Tiền Internet 
-
-- Mua gạo • Ăn lẩu 
-
-- Mua nước uống 
-
-## **5. Chia chi phí** 
-
-Hệ thống hỗ trợ nhiều cách chia tiền. 
-
-## **Chia đều** 
-
-Ví dụ: 
-
-```
+```text
 900.000
+
 Long
 Nam
 Huy
+
 => Mỗi người 300.000
 ```
 
-## **Chia theo số tiền cố định** 
+### Chia theo số tiền cố định
 
-```
+```text
 Long : 500.000
+
 Nam : 300.000
+
 Huy : 100.000
 ```
 
-## **Chia theo phần trăm** 
+### Chia theo phần trăm
 
-```
+```text
 Long : 50%
-Nam : 30%
-```
 
-```
+Nam : 30%
+
 Huy : 20%
 ```
 
-Có thể mở rộng: 
+Có thể mở rộng:
 
-- Chia theo trọng số 
+* Chia theo trọng số
+* Chia theo số ngày ở
+* Chia theo số lần sử dụng
 
-- Chia theo số ngày ở 
+---
 
-- Chia theo số lần sử dụng 
+## 6. Công nợ
 
-## **6. Công nợ** 
+Hệ thống tự động tính:
 
-Hệ thống tự động tính: 
+* Ai đang nợ ai
+* Tổng số tiền còn nợ
+* Lịch sử thanh toán
 
-- Ai đang nợ ai 
+Ví dụ:
 
-- Tổng số tiền còn nợ 
-
-- Lịch sử thanh toán 
-
-Ví dụ: 
-
-```
+```text
 Long nợ Nam 150.000
+
 Nam nợ Huy 90.000
 ```
 
-## **7. Nhật ký hoạt động** 
+---
 
-Lưu lại toàn bộ lịch sử thay đổi. 
+## 7. Nhật ký hoạt động
 
-Ví dụ: 
+Lưu lại toàn bộ lịch sử thay đổi.
 
-- Thêm khoản chi 
+Ví dụ:
 
-- Chỉnh sửa khoản chi 
+* Thêm khoản chi
+* Chỉnh sửa khoản chi
+* Xóa khoản chi
+* Thanh toán công nợ
+* Thêm thành viên
+* Xóa thành viên
 
-- Xóa khoản chi 
+---
 
-- Thanh toán công nợ 
+## 8. Thống kê
 
-- Thêm thành viên 
+Dashboard hiển thị:
 
-- Xóa thành viên 
+* Tổng chi tiêu
+* Chi tiêu theo tháng
+* Chi tiêu theo thành viên
+* Công nợ hiện tại
+* Tổng số tiền đã thanh toán
 
-## **8. Thống kê** 
+---
 
-Dashboard hiển thị: 
+## 9. Thông báo (Tương lai)
 
-- Tổng chi tiêu 
+* Có khoản chi mới
+* Có người thanh toán
+* Nhắc thanh toán
+* Thành viên mới tham gia
 
-- Chi tiêu theo tháng 
+---
 
-- Chi tiêu theo thành viên 
+# 🏗 Kiến trúc hệ thống
 
-- Công nợ hiện tại 
-
-- Tổng số tiền đã thanh toán 
-
-## **9. Thông báo (Tương lai)** 
-
-- Có khoản chi mới 
-
-- Có người thanh toán 
-
-- Nhắc thanh toán 
-
-- Thành viên mới tham gia 
-
-## **Kiến trúc hệ thống** 
-
-```
+```text
 Frontend
     │
 REST API
@@ -236,22 +229,29 @@ Repository
 PostgreSQL
 ```
 
-Các thành phần có thể bổ sung sau: 
+Các thành phần có thể bổ sung sau:
 
-- Redis • RabbitMQ / Kafka • Object Storage • Kubernetes • Monitoring • CI/CD 
+* Redis
+* RabbitMQ / Kafka
+* Object Storage
+* Kubernetes
+* Monitoring
+* CI/CD
 
-## **Cấu trúc dự án** 
+---
 
-```
+# 📂 Cấu trúc dự án
+
+```text
 expense-sharing/
-```
 
-- `├── backend/ │   ├── api/ │   ├── service/` 
-
-- `│   ├── repository/ │   ├── domain/ │   ├── security/ │   ├── common/` 
-
-
-```
+├── backend/
+│   ├── api/
+│   ├── service/
+│   ├── repository/
+│   ├── domain/
+│   ├── security/
+│   ├── common/
 │   └── config/
 │
 ├── frontend/
@@ -266,114 +266,112 @@ expense-sharing/
 └── README.md
 ```
 
-## **Công nghệ sử dụng** 
+---
 
-## **Backend** 
+# 🛠 Công nghệ sử dụng
 
-- Java 21 • Spring Boot • Spring Security • Spring Validation • Spring Data JPA hoặc MyBatis • PostgreSQL • Flyway • Lombok 
+## Backend
 
-## **Frontend** 
+* Java 21
+* Spring Boot
+* Spring Security
+* Spring Validation
+* Spring Data JPA hoặc MyBatis
+* PostgreSQL
+* Flyway
+* Lombok
 
-- React • TypeScript • TailwindCSS • React Query 
+## Frontend
 
-## **Triển khai** 
+* React
+* TypeScript
+* TailwindCSS
+* React Query
 
-- Docker • Docker Compose • Kubernetes 
+## Triển khai
 
-- Nginx 
+* Docker
+* Docker Compose
+* Kubernetes
+* Nginx
 
-Có thể mở rộng: 
+Có thể mở rộng:
 
-- Harbor 
+* Harbor
+* Rancher
+* GitHub Actions
+* Jenkins
 
-- Rancher • GitHub Actions 
+---
 
-- Jenkins 
+# 🗂 Mô hình dữ liệu chính
 
+Các thực thể cốt lõi:
 
-## **Mô hình dữ liệu chính** 
+* User
+* House
+* HouseMember
+* Expense
+* ExpenseParticipant
+* Settlement
+* AuditLog
 
-Các thực thể cốt lõi: 
+---
 
-- User 
+# 🚀 Lộ trình phát triển
 
-- House 
+## Phiên bản 1
 
-- HouseMember 
+* Đăng ký / Đăng nhập
+* Quản lý nhóm
+* CRUD khoản chi
+* Chia đều
+* Tính công nợ
 
-- Expense 
+## Phiên bản 2
 
-- ExpenseParticipant 
+* Chia theo phần trăm
+* Chia theo số tiền
+* Dashboard
+* Nhật ký hoạt động
 
-- Settlement 
+## Phiên bản 3
 
-- AuditLog 
+* Upload hóa đơn
+* Xuất PDF
+* Xuất Excel
+* Thông báo
 
-## **Lộ trình phát triển** 
+## Phiên bản 4
 
-## **Phiên bản 1** 
+* Ứng dụng di động
+* API công khai
+* WebSocket
+* Đa ngôn ngữ
 
-- Đăng ký / Đăng nhập • Quản lý nhóm 
+---
 
-- CRUD khoản chi 
+# 🎯 Định hướng phát triển
 
-- Chia đều • Tính công nợ 
+Dự án được thiết kế theo hướng **Domain-Driven Design (DDD)** và **RESTful API**, đảm bảo khả năng mở rộng khi số lượng người dùng và chức năng tăng lên.
 
-## **Phiên bản 2** 
+Trong tương lai, hệ thống có thể phát triển thành nền tảng quản lý tài chính nhóm dành cho:
 
-- Chia theo phần trăm 
+* Nhà trọ
+* Gia đình
+* Nhóm bạn
+* Câu lạc bộ
+* Doanh nghiệp nhỏ
+* Nhóm du lịch
 
-- Chia theo số tiền 
+---
 
-- Dashboard 
+# 📄 Giấy phép
 
-- Nhật ký hoạt động 
+MIT License
 
-## **Phiên bản 3** 
+---
 
-- Upload hóa đơn 
+# 👨‍💻 Tác giả
 
-- Xuất PDF 
-
-- Xuất Excel 
-
-- Thông báo 
-
-## **Phiên bản 4** 
-
-- Ứng dụng di động 
-
-- API công khai 
-
-- WebSocket 
-
-- Đa ngôn ngữ 
-
-
-## © **Định hướng phát triển** 
-
-Dự án được thiết kế theo hướng **Domain-Driven Design (DDD)** và **RESTful API** , đảm bảo khả năng mở rộng khi số lượng người dùng và chức năng tăng lên. 
-
-Trong tương lai, hệ thống có thể phát triển thành nền tảng quản lý tài chính nhóm dành cho: 
-
-- Nhà trọ 
-
-- Gia đình 
-
-- Nhóm bạn 
-
-- Câu lạc bộ 
-
-- Doanh nghiệp nhỏ 
-
-- Nhóm du lịch 
-
-## **Giấy phép** 
-
-MIT License 
-
-## **Tác giả** 
-
-Dự án được phát triển nhằm mục đích học tập, nghiên cứu và xây dựng Portfolio cho vị trí **Java Backend Developer** , đồng thời hướng tới khả năng triển khai thực tế trong môi trường doanh nghiệp. 
-
-
+Dự án được phát triển nhằm mục đích học tập, nghiên cứu và xây dựng Portfolio cho vị trí **Java Backend Developer**, đồng thời hướng tới khả năng triển khai thực tế trong môi trường doanh nghiệp.
