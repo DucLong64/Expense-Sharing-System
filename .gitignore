@@ -33,7 +33,6 @@ logs/
 
 # Local / secrets
 .env
-.env.*
 application-local.yml
 application-*.local.yml
 
