@@ -1,5 +1,7 @@
 # Chạy Backend Local
 
+> Deploy cho nhiều người dùng: xem [deployment.md](deployment.md).
+
 ## Yêu cầu
 
 - Java 21

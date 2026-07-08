@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { ChartIcon, ScaleIcon, UsersIcon, WalletIcon } from '@/shared/components/icons'
+import { AppLogo } from '@/shared/components/app-logo'
+import { ChartIcon, ScaleIcon, UsersIcon } from '@/shared/components/icons'
 
 interface AuthLayoutProps {
   title: string
@@ -24,12 +24,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           <div className="absolute bottom-10 right-10 h-96 w-96 rounded-full bg-teal-300/20 blur-3xl" />
         </div>
         <div className="relative">
-          <Link to="/" className="flex items-center gap-3 text-white">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-              <WalletIcon className="h-6 w-6" />
-            </span>
-            <span className="text-lg font-bold">Expense Sharing</span>
-          </Link>
+          <AppLogo variant="long" className="brightness-0 invert" />
           <h2 className="mt-16 max-w-md text-3xl font-bold leading-tight text-white">
             Quản lý chi tiêu chung — đơn giản và rõ ràng
           </h2>
@@ -52,12 +47,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
       <div className="flex items-center justify-center px-4 py-10 sm:px-8">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
-            <Link to="/" className="flex items-center gap-2 text-emerald-700">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white">
-                <WalletIcon className="h-5 w-5" />
-              </span>
-              <span className="text-sm font-bold text-slate-900">Expense Sharing</span>
-            </Link>
+            <AppLogo variant="long" />
           </div>
 
           <div className="mb-8">

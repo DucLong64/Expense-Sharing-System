@@ -12,6 +12,12 @@ export interface SettleDebtRequest {
   note?: string
 }
 
+export interface ConfirmDebtReceivedRequest {
+  fromUserId: string
+  amount: number
+  note?: string
+}
+
 export interface SettlementResponse {
   id: string
   houseId: string

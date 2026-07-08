@@ -16,7 +16,7 @@ export function HousesPage() {
   return (
     <AppShell
       title="Nhóm của tôi"
-      subtitle="Chọn nhóm để xem chi tiêu, công nợ và dashboard."
+      subtitle="Chọn nhóm để xem chi tiêu và công nợ."
     >
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-[var(--shadow-soft)]">

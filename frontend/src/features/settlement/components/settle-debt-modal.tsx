@@ -14,11 +14,8 @@ interface SettleDebtModalProps {
 }
 
 export function SettleDebtModal({ open, houseId, prefillDebt, onClose }: SettleDebtModalProps) {
-  const { form, onSubmit, isSubmitting, creditorOptions } = useSettleDebtForm(
-    houseId,
-    open ? prefillDebt : null,
-    onClose,
-  )
+  const { form, onSubmit, isSubmitting, creditorOptions, maxPayableAmount, hasPayableDebts } =
+    useSettleDebtForm(houseId, open ? prefillDebt : null, onClose)
   const { register, formState } = form
 
   const description = prefillDebt
@@ -27,28 +24,40 @@ export function SettleDebtModal({ open, houseId, prefillDebt, onClose }: SettleD
 
   return (
     <Modal open={open} onClose={onClose} title="Ghi nhận thanh toán" description={description}>
-      <form className="space-y-4" onSubmit={onSubmit}>
-        <Select
-          label="Người nhận"
-          placeholder="Chọn người nhận"
-          error={formState.errors.toUserId?.message}
-          options={creditorOptions.map((creditor) => ({
-            value: creditor.userId,
-            label: displayUsername(creditor.username, creditor.userId),
-          }))}
-          {...register('toUserId')}
-        />
-        <Input
-          label="Số tiền"
-          type="number"
-          min="1"
-          error={formState.errors.amount?.message}
-          {...register('amount', { valueAsNumber: true })}
-        />
-        <Input label="Ghi chú" error={formState.errors.note?.message} {...register('note')} />
-        <ErrorMessage message={formState.errors.root?.message} />
-        <ModalActions onCancel={onClose} submitLabel="Ghi nhận thanh toán" loading={isSubmitting} />
-      </form>
+      {!hasPayableDebts ? (
+        <p className="text-sm text-slate-500">Bạn hiện không có khoản nợ cần thanh toán trong nhóm.</p>
+      ) : (
+        <form className="space-y-4" onSubmit={onSubmit}>
+          <Select
+            label="Người nhận"
+            placeholder="Chọn người nhận"
+            error={formState.errors.toUserId?.message}
+            options={creditorOptions.map((creditor) => ({
+              value: creditor.userId,
+              label: `${displayUsername(creditor.username, creditor.userId)} · ${formatCurrency(creditor.maxAmount)}`,
+            }))}
+            {...register('toUserId')}
+          />
+          <Input
+            label="Số tiền"
+            type="number"
+            min="0.01"
+            max={maxPayableAmount}
+            step="0.01"
+            inputMode="decimal"
+            hint={
+              maxPayableAmount !== undefined
+                ? `Tối đa ${formatCurrency(maxPayableAmount)}`
+                : undefined
+            }
+            error={formState.errors.amount?.message}
+            {...register('amount', { valueAsNumber: true })}
+          />
+          <Input label="Ghi chú" error={formState.errors.note?.message} {...register('note')} />
+          <ErrorMessage message={formState.errors.root?.message} />
+          <ModalActions onCancel={onClose} submitLabel="Ghi nhận thanh toán" loading={isSubmitting} />
+        </form>
+      )}
     </Modal>
   )
 }

@@ -2,10 +2,13 @@ package com.expensesharing.feature.settlement.presentation;
 
 import com.expensesharing.common.response.ApiResponse;
 import com.expensesharing.common.support.UsernameEnricher;
+import com.expensesharing.feature.settlement.application.dto.ConfirmDebtReceivedCommand;
 import com.expensesharing.feature.settlement.application.dto.SettleDebtCommand;
+import com.expensesharing.feature.settlement.application.usecase.ConfirmDebtReceivedUseCase;
 import com.expensesharing.feature.settlement.application.usecase.GetDebtSummaryUseCase;
 import com.expensesharing.feature.settlement.application.usecase.GetSettlementHistoryUseCase;
 import com.expensesharing.feature.settlement.application.usecase.SettleDebtUseCase;
+import com.expensesharing.feature.settlement.presentation.request.ConfirmDebtReceivedRequest;
 import com.expensesharing.feature.settlement.presentation.request.SettleDebtRequest;
 import com.expensesharing.feature.settlement.presentation.response.DebtSummaryResponse;
 import com.expensesharing.feature.settlement.presentation.response.SettlementResponse;
@@ -26,6 +29,7 @@ public class SettlementController {
 
     private final GetDebtSummaryUseCase getDebtSummaryUseCase;
     private final SettleDebtUseCase settleDebtUseCase;
+    private final ConfirmDebtReceivedUseCase confirmDebtReceivedUseCase;
     private final GetSettlementHistoryUseCase getSettlementHistoryUseCase;
     private final UsernameEnricher usernameEnricher;
 
@@ -47,6 +51,20 @@ public class SettlementController {
                 new SettleDebtCommand(houseId, userId, request.toUserId(), request.amount(), request.note()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok(usernameEnricher.toSettlementResponse(settlement), "Settlement recorded successfully."));
+    }
+
+    @PostMapping("/settlements/confirm-received")
+    public ResponseEntity<ApiResponse<SettlementResponse>> confirmReceived(
+            @PathVariable UUID houseId,
+            @Valid @RequestBody ConfirmDebtReceivedRequest request,
+            @AuthenticationPrincipal UUID userId) {
+        var settlement = confirmDebtReceivedUseCase.execute(
+                new ConfirmDebtReceivedCommand(
+                        houseId, userId, request.fromUserId(), request.amount(), request.note()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(
+                        usernameEnricher.toSettlementResponse(settlement),
+                        "Debt received confirmed successfully."));
     }
 
     @GetMapping("/settlements")

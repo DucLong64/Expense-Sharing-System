@@ -2,7 +2,7 @@
 
 > Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch.
 
-**Trạng thái hiện tại:** Phiên bản 1–2 hoàn thành. Phiên bản 3 đang triển khai (profile, đổi MK, xuất báo cáo đã xong).
+**Trạng thái hiện tại:** Sẵn sàng deploy và dùng thử với nhóm nhỏ. Phiên bản 1–2 hoàn thành; phiên bản 3 gần xong (còn upload hóa đơn).
 
 ---
 
@@ -15,8 +15,26 @@ Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ
 - Quản lý các khoản chi minh bạch
 - Theo dõi công nợ giữa các thành viên
 - Tự động tính số tiền mỗi người phải trả
+- Ghi nhận thanh toán (người nợ) và xác nhận đã nhận (người được nợ)
 - Phân quyền theo vai trò trong nhóm
-- Mở rộng thành nền tảng quản lý tài chính nhóm
+- Thông báo in-app khi có hoạt động mới
+
+---
+
+## Triển khai nhanh (cho bạn bè dùng)
+
+Deploy toàn bộ stack bằng Docker trên VPS Linux:
+
+```bash
+cp .env.example .env
+# Chỉnh POSTGRES_PASSWORD, JWT_SECRET, CORS_ALLOWED_ORIGINS trong .env
+
+docker compose -f deployment/docker/docker-compose.prod.yml --env-file .env up -d --build
+```
+
+Truy cập: `http://<IP_SERVER>` — mỗi người đăng ký tài khoản, tạo nhóm và mời thành viên bằng username/email.
+
+**Hướng dẫn chi tiết:** [docs/deployment.md](docs/deployment.md) (HTTPS, firewall, cập nhật, xử lý sự cố).
 
 ---
 
@@ -30,21 +48,24 @@ Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ
 | Mời thành viên (username/email) | ✅ | ✅ | Nhập chính xác identifier |
 | CRUD khoản chi | ✅ | ✅ | |
 | Chia chi phí (EQUAL / FIXED / %) | ✅ | ✅ | |
-| Tính công nợ & ghi nhận thanh toán | ✅ | ✅ | |
+| Tính công nợ | ✅ | ✅ | |
+| Ghi nhận thanh toán (người nợ) | ✅ | ✅ | Modal + validate số tiền |
+| Xác nhận đã nhận (người được nợ) | ✅ | ✅ | `POST .../confirm-received` |
 | Lịch sử thanh toán | ✅ | ✅ | |
-| Dashboard thống kê | ✅ | ✅ | |
+| Dashboard & tab Tổng quan | ✅ | ✅ | Hero công nợ, quick actions |
 | Nhật ký hoạt động | ✅ | ✅ | Theo nhóm + toàn bộ của user |
+| Thông báo in-app | ✅ | ✅ | Bell dropdown + trang danh sách |
 | Hiển thị username trên UI | ✅ | ✅ | Thay UUID rút gọn |
+| Profile & đổi mật khẩu | ✅ | ✅ | `/profile` |
+| Xuất Excel / PDF báo cáo | ✅ | ✅ | Tab Tổng quan |
+| UI/UX (modal, menu, toast) | — | ✅ | Confirm dialog, dropdown, tabs |
 | Soft delete | ✅ | — | users, houses, members, expenses |
-| Unit test (Backend) | ✅ | — | ~29 test classes |
+| Unit test (Backend) | ✅ | — | ~30 test classes |
 | Swagger / OpenAPI | ✅ | — | `/swagger-ui.html` |
-| `GET /users/me` (profile) | ✅ | ✅ | Trang `/profile` |
-| Đổi mật khẩu | ✅ | ✅ | `PATCH /users/me/password` |
-| Xuất Excel / PDF báo cáo nhóm | ✅ | ✅ | Tab Dashboard |
+| Docker production | ✅ | ✅ | `docker-compose.prod.yml` |
 | Upload hóa đơn | ⬜ | ⬜ | Phiên bản 3 |
-| Thông báo | ✅ | ✅ | In-app, badge chưa đọc |
 | Frontend tests | ⬜ | ⬜ | |
-| Kubernetes / CI/CD | ⬜ | ⬜ | Chỉ có Docker Compose |
+| Kubernetes / CI/CD | ⬜ | ⬜ | |
 
 ---
 
@@ -108,9 +129,14 @@ Hóa đơn đính kèm: **chưa triển khai** (Phiên bản 3).
 
 ### 6. Công nợ & thanh toán
 
-- Tự động tính ai đang nợ ai
-- Ghi nhận thanh toán giữa các thành viên
-- Lịch sử thanh toán
+| Luồng | Ai thực hiện | Mô tả |
+| ----- | ------------ | ----- |
+| Ghi nhận thanh toán | Người **nợ** | Tự ghi khi đã trả tiền cho người khác |
+| Xác nhận đã nhận | Người **được nợ** | Xác nhận khi đã nhận tiền từ người nợ |
+
+- Tự động tính ai đang nợ ai (sau khoản chi + các lần thanh toán)
+- Không cho ghi nhận vượt quá số nợ hiện tại
+- Lịch sử thanh toán đầy đủ
 
 ### 7. Nhật ký hoạt động
 
@@ -118,18 +144,16 @@ Ghi lại: thêm/sửa/xóa khoản chi, thanh toán công nợ, thêm/xóa thà
 
 ### 8. Dashboard
 
-- Tổng chi tiêu
-- Tổng đã thanh toán
-- Chi tiêu theo tháng
-- Chi tiêu theo thành viên (hiển thị username)
-- Công nợ hiện tại (trong response API)
+- Tổng chi tiêu, tổng đã thanh toán
+- Chi tiêu theo tháng / theo thành viên
+- Tab **Tổng quan**: số dư cá nhân, công nợ, khoản chi & hoạt động gần đây
+- Xuất Excel / PDF
 
-### 9. Thông báo (Tương lai)
+### 9. Thông báo
 
-- Có khoản chi mới
-- Có người thanh toán
-- Nhắc thanh toán
-- Thành viên mới tham gia
+- Khoản chi mới, thanh toán, xác nhận đã nhận, thành viên mới...
+- Badge chưa đọc trên header, panel dropdown kiểu Facebook
+- Trang xem tất cả thông báo
 
 ---
 
@@ -143,11 +167,11 @@ Presentation  →  Application  →  Domain  →  Infrastructure
 
 ```text
 React (Vite) ──REST──► Spring Boot ──► PostgreSQL
-                            │
-                         Flyway
+       │                      │
+    Nginx (prod)           Flyway
 ```
 
-Có thể bổ sung sau: Redis, Message Queue, Object Storage, Kubernetes, Monitoring, CI/CD.
+Production: Nginx phục vụ SPA và proxy `/api` tới Spring Boot (xem [docs/deployment.md](docs/deployment.md)).
 
 ---
 
@@ -156,27 +180,39 @@ Có thể bổ sung sau: Redis, Message Queue, Object Storage, Kubernetes, Monit
 ```text
 Expense-Sharing-System/
 ├── backend/
+│   ├── Dockerfile
 │   └── src/main/java/com/expensesharing/
-│       ├── common/              # exception, response, port, support
-│       ├── config/              # Security, ...
+│       ├── common/
+│       ├── config/
 │       └── feature/
-│           ├── auth/            # application / domain / infrastructure / presentation
+│           ├── auth/
 │           ├── house/
 │           ├── expense/
 │           ├── settlement/
 │           ├── dashboard/
-│           └── activity/
-           └── report/
-│   └── src/main/resources/db/migration/   # Flyway V1–V7
+│           ├── activity/
+│           ├── report/
+│           └── notification/
+│   └── src/main/resources/db/migration/   # Flyway V1–V8
 │
 ├── frontend/
+│   ├── Dockerfile
+│   ├── nginx/default.conf
 │   └── src/
-│       ├── app/                 # router, providers
-│       ├── features/            # auth, house, expense, settlement, dashboard, activity
-│       └── shared/              # api, components, hooks, utils
+│       ├── app/
+│       ├── features/
+│       └── shared/
 │
-├── deployment/docker/         # docker-compose.yml (PostgreSQL)
-├── docs/                        # local-development.md
+├── deployment/docker/
+│   ├── docker-compose.yml          # PostgreSQL (dev)
+│   ├── docker-compose.prod.yml     # Full stack (production)
+│   └── nginx/default.conf          # (tham chiếu; bản dùng: frontend/nginx/)
+│
+├── docs/
+│   ├── local-development.md
+│   └── deployment.md
+│
+├── .env.example
 └── README.md
 ```
 
@@ -186,36 +222,26 @@ Expense-Sharing-System/
 
 ### Backend
 
-- Java 21
-- Spring Boot 3.3
+- Java 21, Spring Boot 3.3
 - Spring Security + JWT + BCrypt
-- Spring Data JPA
 - PostgreSQL + Flyway
-- SpringDoc OpenAPI (Swagger)
-- Apache POI (Excel export)
-- OpenPDF (PDF export)
-- Lombok
-- JUnit 5
+- SpringDoc OpenAPI, Apache POI, OpenPDF
 
 ### Frontend
 
-- React 19 + TypeScript
-- Vite 8
-- Tailwind CSS v4
-- TanStack Query (React Query)
-- React Hook Form + Zod
-- Axios + React Router
+- React 19 + TypeScript + Vite 8
+- Tailwind CSS v4, TanStack Query, React Hook Form + Zod
 
 ### Triển khai
 
-- Docker + Docker Compose (PostgreSQL) — **đã có**
-- Kubernetes, Nginx, CI/CD — **chưa có**
+- **Dev:** Docker Compose (PostgreSQL) + chạy backend/frontend trên máy
+- **Production:** Docker Compose full stack (`docker-compose.prod.yml`)
 
 ---
 
-## API (33 endpoints)
+## API (34 endpoints)
 
-Base URL: `http://localhost:8080/api/v1`
+Base URL: `/api/v1` (local: `http://localhost:8080`; production: cùng origin qua Nginx)
 
 | Nhóm | Endpoints |
 | ---- | --------- |
@@ -223,13 +249,13 @@ Base URL: `http://localhost:8080/api/v1`
 | **User** | `GET /users/me`, `PATCH /users/me/password` |
 | **House** | `POST/GET/PUT/DELETE /houses`, `GET/POST /houses/{id}/members`, `PUT/DELETE /houses/{id}/members/{userId}`, `DELETE /houses/{id}/members/me` |
 | **Expense** | `POST/GET/PUT/DELETE /houses/{id}/expenses` |
-| **Settlement** | `GET /houses/{id}/debts`, `POST/GET /houses/{id}/settlements` |
+| **Settlement** | `GET /houses/{id}/debts`, `POST/GET /houses/{id}/settlements`, `POST /houses/{id}/settlements/confirm-received` |
 | **Dashboard** | `GET /houses/{id}/dashboard` |
 | **Report** | `GET /houses/{id}/reports/excel`, `GET /houses/{id}/reports/pdf` |
 | **Notification** | `GET /notifications`, `GET /notifications/unread-count`, `PATCH /notifications/{id}/read`, `PATCH /notifications/read-all` |
 | **Activity** | `GET /houses/{id}/activities`, `GET /users/me/activities` |
 
-Tài liệu tương tác: **http://localhost:8080/swagger-ui.html**
+Tài liệu tương tác: `/swagger-ui.html`
 
 ### Ví dụ request
 
@@ -245,16 +271,6 @@ POST /api/v1/auth/register
 }
 ```
 
-**Đăng nhập:**
-
-```json
-POST /api/v1/auth/login
-{
-  "username": "long_dev",
-  "password": "password123"
-}
-```
-
 **Mời thành viên:**
 
 ```json
@@ -265,7 +281,18 @@ POST /api/v1/houses/{houseId}/members
 }
 ```
 
-`identifier` có thể là username hoặc email (tự trim, khớp chính xác).
+`identifier` có thể là username hoặc email (trim, khớp chính xác).
+
+**Xác nhận đã nhận tiền (người được nợ):**
+
+```json
+POST /api/v1/houses/{houseId}/settlements/confirm-received
+{
+  "fromUserId": "uuid-nguoi-no",
+  "amount": 150000,
+  "note": "Chuyển khoản Vietcombank"
+}
+```
 
 ---
 
@@ -279,16 +306,17 @@ POST /api/v1/houses/{houseId}/members
 | `house_members` | Thành viên & vai trò |
 | `expenses` | Khoản chi |
 | `expense_participants` | Phần chia của từng thành viên |
-| `settlements` | Ghi nhận thanh toán |
+| `settlements` | Ghi nhận thanh toán / xác nhận đã nhận |
 | `activity_logs` | Nhật ký hoạt động |
+| `notifications` | Thông báo in-app |
 
 Migration: `V1` auth → `V2` houses → `V3` expenses → `V4` settlements → `V5` activity → `V6` soft delete → `V7` username → `V8` notifications
 
 ---
 
-## Chạy local
+## Chạy local (phát triển)
 
-Xem hướng dẫn chi tiết: [docs/local-development.md](docs/local-development.md)
+Xem [docs/local-development.md](docs/local-development.md)
 
 **Tóm tắt:**
 
@@ -303,42 +331,29 @@ cd backend && mvn spring-boot:run
 cd frontend && npm install && npm run dev
 ```
 
-**Yêu cầu:** Java 21, Maven 3.9+, Node.js 20+, Docker Desktop.
+**Yêu cầu:** Java 21, Maven 3.9+, Node.js 20+, Docker.
 
 ---
 
 ## Lộ trình phát triển
 
-### Phiên bản 1 — ✅ Hoàn thành
+### Phiên bản 1–2 — ✅ Hoàn thành
 
-- Đăng ký / Đăng nhập
-- Quản lý nhóm
-- CRUD khoản chi
-- Chia đều
-- Tính công nợ
+Auth, nhóm, khoản chi, chia phí, công nợ, dashboard, activity, username, soft delete, frontend đầy đủ.
 
-### Phiên bản 2 — ✅ Hoàn thành
+### Phiên bản 3 — 🔄 Gần hoàn thành (tạm dừng để deploy)
 
-- Chia theo phần trăm & số tiền cố định
-- Dashboard
-- Nhật ký hoạt động
-- Frontend đầy đủ (React + các tab nhóm)
-- Username, soft delete, hiển thị username
-
-### Phiên bản 3 — 🔄 Đang triển khai
-
-- ✅ `GET /users/me` + trang profile
-- ✅ Đổi mật khẩu
-- ✅ Xuất Excel / PDF báo cáo nhóm
+- ✅ Profile, đổi mật khẩu
+- ✅ Xuất Excel / PDF
 - ✅ Thông báo in-app
+- ✅ Xác nhận đã nhận (creditor flow)
+- ✅ UI/UX: modal, tabs, dropdown, toast
+- ✅ Docker production
 - ⬜ Upload hóa đơn
 
 ### Phiên bản 4 — ⬜ Kế hoạch
 
-- Ứng dụng di động
-- API công khai
-- WebSocket
-- Đa ngôn ngữ
+- Ứng dụng di động, API công khai, WebSocket, đa ngôn ngữ
 
 ---
 
@@ -346,7 +361,7 @@ cd frontend && npm install && npm run dev
 
 Dự án hướng tới nền tảng quản lý tài chính nhóm cho nhà trọ, gia đình, nhóm bạn, câu lạc bộ, doanh nghiệp nhỏ, nhóm du lịch.
 
-Phục vụ học tập, nghiên cứu và xây dựng Portfolio **Java Backend Developer**, đồng thời hướng tới triển khai thực tế trong môi trường doanh nghiệp.
+Phục vụ học tập, nghiên cứu và xây dựng Portfolio **Java Backend Developer**, đồng thời triển khai thực tế cho nhóm nhỏ.
 
 ---
 

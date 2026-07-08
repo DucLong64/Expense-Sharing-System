@@ -1,5 +1,6 @@
 package com.expensesharing.feature.auth.infrastructure.security;
 
+import com.expensesharing.config.SecurityResponseWriter;
 import com.expensesharing.feature.auth.application.port.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenService tokenService;
+    private final SecurityResponseWriter securityResponseWriter;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -28,7 +30,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = extractToken(request);
 
-        if (token != null && tokenService.isAccessTokenValid(token)) {
+        if (token != null) {
+            if (!tokenService.isAccessTokenValid(token)) {
+                securityResponseWriter.writeUnauthorized(response);
+                return;
+            }
+
             UUID userId = tokenService.extractUserId(token);
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(userId, null, List.of());

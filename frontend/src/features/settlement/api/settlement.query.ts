@@ -31,16 +31,31 @@ export function useSettleDebt(houseId: string) {
   return useMutation({
     mutationFn: (payload: Parameters<typeof settlementApi.settleDebt>[1]) =>
       settlementApi.settleDebt(houseId, payload),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: settlementKeys.debts(houseId) }),
-        queryClient.invalidateQueries({ queryKey: settlementKeys.history(houseId) }),
-        queryClient.invalidateQueries({ queryKey: dashboardKeys.detail(houseId) }),
-        queryClient.invalidateQueries({ queryKey: activityKeys.house(houseId) }),
-        queryClient.invalidateQueries({ queryKey: activityKeys.my() }),
-        queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount }),
-        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
-      ])
-    },
+    onSuccess: async () => invalidateSettlementQueries(queryClient, houseId),
   })
+}
+
+export function useConfirmDebtReceived(houseId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (payload: Parameters<typeof settlementApi.confirmDebtReceived>[1]) =>
+      settlementApi.confirmDebtReceived(houseId, payload),
+    onSuccess: async () => invalidateSettlementQueries(queryClient, houseId),
+  })
+}
+
+async function invalidateSettlementQueries(
+  queryClient: ReturnType<typeof useQueryClient>,
+  houseId: string,
+) {
+  await Promise.all([
+    queryClient.invalidateQueries({ queryKey: settlementKeys.debts(houseId) }),
+    queryClient.invalidateQueries({ queryKey: settlementKeys.history(houseId) }),
+    queryClient.invalidateQueries({ queryKey: dashboardKeys.detail(houseId) }),
+    queryClient.invalidateQueries({ queryKey: activityKeys.house(houseId) }),
+    queryClient.invalidateQueries({ queryKey: activityKeys.my() }),
+    queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount }),
+    queryClient.invalidateQueries({ queryKey: ['notifications'] }),
+  ])
 }

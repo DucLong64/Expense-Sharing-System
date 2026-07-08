@@ -25,12 +25,9 @@ export function ActivityList({ activities }: ActivityListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="divide-y divide-slate-100">
       {activities.map((activity) => (
-        <div
-          key={activity.id}
-          className="flex gap-4 rounded-xl border border-slate-200/80 bg-slate-50/50 p-4"
-        >
+        <div key={activity.id} className="flex gap-4 py-4 first:pt-0">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-xs font-bold text-emerald-700">
             {activityTypeLabels[activity.type].slice(0, 2)}
           </span>
@@ -49,17 +46,18 @@ export function ActivityList({ activities }: ActivityListProps) {
 
 interface ActivitySectionProps {
   houseId: string
+  embedded?: boolean
 }
 
-export function ActivitySection({ houseId }: ActivitySectionProps) {
+export function ActivitySection({ houseId, embedded = false }: ActivitySectionProps) {
   const [filter, setFilter] = useState<ActivityType | ''>('')
   const { data: activities = [], isLoading, error, refetch } = useHouseActivities(
     houseId,
     filter || undefined,
   )
 
-  return (
-    <Card title="Nhật ký hoạt động" description="Theo dõi mọi thay đổi trong nhóm">
+  const content = (
+    <>
       <div className="mb-4">
         <select
           className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm shadow-sm"
@@ -85,6 +83,16 @@ export function ActivitySection({ houseId }: ActivitySectionProps) {
         </div>
       ) : null}
       {!isLoading && !error ? <ActivityList activities={activities} /> : null}
+    </>
+  )
+
+  if (embedded) {
+    return content
+  }
+
+  return (
+    <Card title="Nhật ký hoạt động" description="Theo dõi mọi thay đổi trong nhóm">
+      {content}
     </Card>
   )
 }

@@ -7,10 +7,11 @@ export const notificationKeys = {
   unreadCount: ['notifications', 'unread-count'] as const,
 }
 
-export function useMyNotifications(filter?: NotificationFilter) {
+export function useMyNotifications(filter?: NotificationFilter, enabled = true) {
   return useQuery({
     queryKey: notificationKeys.all(filter),
     queryFn: () => notificationApi.getMyNotifications(filter),
+    enabled,
   })
 }
 
