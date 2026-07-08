@@ -8,13 +8,16 @@ import {
 import { Button } from '@/shared/components/button'
 import { Card } from '@/shared/components/card'
 import { getCurrentUserId } from '@/shared/auth/current-user'
+import { useConfirm } from '@/shared/hooks/use-confirm'
 
 interface HouseSettingsSectionProps {
   houseId: string
+  houseName?: string
   onEdit: () => void
 }
 
-export function HouseSettingsSection({ houseId, onEdit }: HouseSettingsSectionProps) {
+export function HouseSettingsSection({ houseId, houseName, onEdit }: HouseSettingsSectionProps) {
+  const { confirm } = useConfirm()
   const currentUserId = getCurrentUserId()
   const { data: members = [] } = useHouseMembers(houseId)
   const currentMember = findCurrentMember(members, currentUserId)
@@ -24,14 +27,30 @@ export function HouseSettingsSection({ houseId, onEdit }: HouseSettingsSectionPr
   const canDelete = currentMember ? canDeleteHouse(currentMember.role) : false
 
   async function handleDelete() {
-    if (!window.confirm('Xóa nhóm này? Hành động không thể hoàn tác.')) {
+    const accepted = await confirm({
+      title: 'Xóa nhóm?',
+      description: houseName
+        ? `"${houseName}" và toàn bộ dữ liệu liên quan sẽ bị xóa vĩnh viễn.`
+        : 'Nhóm và toàn bộ dữ liệu liên quan sẽ bị xóa vĩnh viễn.',
+      confirmLabel: 'Xóa nhóm',
+      tone: 'danger',
+    })
+    if (!accepted) {
       return
     }
     await deleteHouse()
   }
 
   async function handleLeave() {
-    if (!window.confirm('Rời khỏi nhóm này?')) {
+    const accepted = await confirm({
+      title: 'Rời nhóm?',
+      description: houseName
+        ? `Bạn sẽ không còn truy cập nhóm "${houseName}".`
+        : 'Bạn sẽ không còn truy cập nhóm này.',
+      confirmLabel: 'Rời nhóm',
+      tone: 'danger',
+    })
+    if (!accepted) {
       return
     }
     await leaveHouse()

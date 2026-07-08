@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import * as settlementApi from '@/features/settlement/api/settlement.api'
 import { activityKeys } from '@/features/activity/api/activity.query'
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.query'
+import { notificationKeys } from '@/features/notification/api/notification.query'
 
 export const settlementKeys = {
   debts: (houseId: string) => ['debts', houseId] as const,
@@ -37,6 +38,8 @@ export function useSettleDebt(houseId: string) {
         queryClient.invalidateQueries({ queryKey: dashboardKeys.detail(houseId) }),
         queryClient.invalidateQueries({ queryKey: activityKeys.house(houseId) }),
         queryClient.invalidateQueries({ queryKey: activityKeys.my() }),
+        queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount }),
+        queryClient.invalidateQueries({ queryKey: ['notifications'] }),
       ])
     },
   })

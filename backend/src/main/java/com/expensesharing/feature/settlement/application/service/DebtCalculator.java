@@ -45,10 +45,10 @@ public class DebtCalculator {
             }
         }
 
-        // Trừ tiền đã thanh toán (from) và cộng tiền đã nhận (to)
+        // Người trả (from) giảm nợ; người nhận (to) giảm khoản được nhận
         for (Settlement s : settlementRepository.findAllByHouseId(houseId)) {
-            balance.merge(s.getFromUserId(), s.getAmount().negate(), BigDecimal::add);
-            balance.merge(s.getToUserId(), s.getAmount(), BigDecimal::add);
+            balance.merge(s.getFromUserId(), s.getAmount(), BigDecimal::add);
+            balance.merge(s.getToUserId(), s.getAmount().negate(), BigDecimal::add);
         }
 
         return balance;

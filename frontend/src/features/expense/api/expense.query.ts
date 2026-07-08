@@ -3,6 +3,7 @@ import * as expenseApi from '@/features/expense/api/expense.api'
 import { activityKeys } from '@/features/activity/api/activity.query'
 import { houseKeys } from '@/features/house/api/house.query'
 import { dashboardKeys } from '@/features/dashboard/api/dashboard.query'
+import { notificationKeys } from '@/features/notification/api/notification.query'
 import { settlementKeys } from '@/features/settlement/api/settlement.query'
 
 export const expenseKeys = {
@@ -22,6 +23,8 @@ function invalidateExpenseRelatedQueries(
     queryClient.invalidateQueries({ queryKey: houseKeys.members(houseId) }),
     queryClient.invalidateQueries({ queryKey: activityKeys.house(houseId) }),
     queryClient.invalidateQueries({ queryKey: activityKeys.my() }),
+    queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount }),
+    queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   ])
 }
 

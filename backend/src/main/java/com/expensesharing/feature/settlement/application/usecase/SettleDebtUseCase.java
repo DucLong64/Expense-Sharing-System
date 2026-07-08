@@ -2,6 +2,9 @@ package com.expensesharing.feature.settlement.application.usecase;
 
 import com.expensesharing.common.exception.ForbiddenException;
 import com.expensesharing.common.exception.NotFoundException;
+import com.expensesharing.feature.notification.application.service.NotificationService;
+import com.expensesharing.feature.notification.domain.model.NotificationTargetType;
+import com.expensesharing.feature.notification.domain.model.NotificationType;
 import com.expensesharing.feature.activity.application.service.ActivityLogService;
 import com.expensesharing.feature.activity.domain.model.ActivityTargetType;
 import com.expensesharing.feature.activity.domain.model.ActivityType;
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class SettleDebtUseCase {
 
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
     private final HouseRepository houseRepository;
     private final HouseMemberRepository houseMemberRepository;
     private final SettlementRepository settlementRepository;
@@ -63,6 +67,15 @@ public class SettleDebtUseCase {
                 ActivityTargetType.SETTLEMENT,
                 savedSettlement.getId(),
                 "Recorded a debt settlement."
+        );
+
+        notificationService.notifyHouseMembersExcept(
+                command.houseId(),
+                command.requesterId(),
+                NotificationType.DEBT_SETTLED,
+                "Có thanh toán công nợ mới trong nhóm.",
+                NotificationTargetType.SETTLEMENT,
+                savedSettlement.getId()
         );
 
         return savedSettlement;

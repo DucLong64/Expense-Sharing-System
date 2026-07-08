@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from '@/features/auth/hooks/use-auth'
+import { ConfirmProvider } from '@/shared/hooks/use-confirm'
 import { ToastProvider } from '@/shared/hooks/use-toast'
 
 const queryClient = new QueryClient({
@@ -15,7 +16,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
-        <AuthProvider>{children}</AuthProvider>
+        <ConfirmProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </ConfirmProvider>
       </ToastProvider>
     </QueryClientProvider>
   )

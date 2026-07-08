@@ -5,6 +5,9 @@ import com.expensesharing.common.exception.NotFoundException;
 import com.expensesharing.feature.activity.application.service.ActivityLogService;
 import com.expensesharing.feature.activity.domain.model.ActivityTargetType;
 import com.expensesharing.feature.activity.domain.model.ActivityType;
+import com.expensesharing.feature.notification.application.service.NotificationService;
+import com.expensesharing.feature.notification.domain.model.NotificationTargetType;
+import com.expensesharing.feature.notification.domain.model.NotificationType;
 import com.expensesharing.feature.expense.application.dto.CreateExpenseCommand;
 import com.expensesharing.feature.expense.application.dto.ExpenseResult;
 import com.expensesharing.feature.expense.application.service.SplitCalculator;
@@ -28,6 +31,7 @@ import java.util.UUID;
 public class CreateExpenseUseCase {
 
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
     private final ExpenseRepository expenseRepository;
     private final ExpenseParticipantRepository participantRepository;
     private final HouseRepository houseRepository;
@@ -75,6 +79,15 @@ public class CreateExpenseUseCase {
                 ActivityTargetType.EXPENSE,
                 expense.getId(),
                 "Created expense: " + expense.getTitle()
+        );
+
+        notificationService.notifyHouseMembersExcept(
+                command.houseId(),
+                command.requesterId(),
+                NotificationType.EXPENSE_CREATED,
+                "Có khoản chi mới: " + expense.getTitle(),
+                NotificationTargetType.EXPENSE,
+                expense.getId()
         );
 
         return new ExpenseResult(expense, participants);

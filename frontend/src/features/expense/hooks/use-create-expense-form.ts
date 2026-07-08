@@ -15,7 +15,11 @@ import { ApiError } from '@/shared/api/api-error'
 import { getCurrentUserId } from '@/shared/auth/current-user'
 import { useToast } from '@/shared/hooks/use-toast'
 
-export function useCreateExpenseForm(houseId: string, members: HouseMemberResponse[]) {
+export function useCreateExpenseForm(
+  houseId: string,
+  members: HouseMemberResponse[],
+  onSuccess?: () => void,
+) {
   const { showToast } = useToast()
   const createExpenseMutation = useCreateExpense(houseId)
   const currentUserId = getCurrentUserId()
@@ -74,6 +78,7 @@ export function useCreateExpenseForm(houseId: string, members: HouseMemberRespon
         participants: createDefaultParticipants(members.map((member) => member.userId)),
       })
       showToast('Thêm khoản chi thành công.', 'success')
+      onSuccess?.()
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : 'Không thể tạo khoản chi.'

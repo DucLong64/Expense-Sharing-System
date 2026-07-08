@@ -16,10 +16,12 @@ import {
 import type { HouseMemberResponse, HouseRole } from '@/features/house/types/house.types'
 import { Button } from '@/shared/components/button'
 import { Card } from '@/shared/components/card'
+import { DropdownMenu } from '@/shared/components/dropdown-menu'
 import { ErrorMessage } from '@/shared/components/error-message'
 import { LoadingState } from '@/shared/components/loading-state'
 import { ApiError } from '@/shared/api/api-error'
 import { getCurrentUserId } from '@/shared/auth/current-user'
+import { useConfirm } from '@/shared/hooks/use-confirm'
 import { useToast } from '@/shared/hooks/use-toast'
 import { formatDateTime, displayUsername } from '@/shared/utils/format'
 
@@ -31,6 +33,7 @@ interface MemberRowProps {
 }
 
 function MemberRow({ member, houseId, currentUserId, currentUserRole }: MemberRowProps) {
+  const { confirm } = useConfirm()
   const { showToast } = useToast()
   const changeRoleMutation = useChangeMemberRole(houseId)
   const removeMutation = useRemoveMember(houseId)
@@ -52,9 +55,16 @@ function MemberRow({ member, houseId, currentUserId, currentUserRole }: MemberRo
   }
 
   async function handleRemove() {
-    if (!window.confirm('Xóa thành viên khỏi nhóm?')) {
+    const accepted = await confirm({
+      title: 'Xóa thành viên?',
+      description: `${displayUsername(member.username, member.userId)} sẽ bị gỡ khỏi nhóm và mất quyền truy cập.`,
+      confirmLabel: 'Xóa thành viên',
+      tone: 'danger',
+    })
+    if (!accepted) {
       return
     }
+
     try {
       await removeMutation.mutateAsync(member.userId)
       showToast('Đã xóa thành viên.', 'success')
@@ -64,7 +74,7 @@ function MemberRow({ member, houseId, currentUserId, currentUserRole }: MemberRo
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-slate-200/80 bg-slate-50/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 py-4 first:pt-0 sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p className="font-medium text-slate-900">
           {displayUsername(member.username, member.userId)}
@@ -87,14 +97,22 @@ function MemberRow({ member, houseId, currentUserId, currentUserRole }: MemberRo
             ))}
           </select>
         ) : (
-          <span className="rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm">
+          <span className="rounded-lg bg-slate-50 px-3 py-1.5 text-sm font-medium text-slate-700">
             {roleLabels[member.role]}
           </span>
         )}
         {canRemove ? (
-          <Button variant="danger" size="sm" className="w-auto" onClick={() => void handleRemove()}>
-            Xóa
-          </Button>
+          <DropdownMenu
+            ariaLabel="Tùy chọn thành viên"
+            items={[
+              {
+                label: 'Xóa khỏi nhóm',
+                tone: 'danger',
+                disabled: removeMutation.isPending,
+                onClick: () => void handleRemove(),
+              },
+            ]}
+          />
         ) : null}
       </div>
     </div>
@@ -135,7 +153,7 @@ export function MembersSection({ houseId }: MembersSectionProps) {
           </div>
         ) : null}
         {!isLoading && !error ? (
-          <div className="space-y-3">
+          <div className="divide-y divide-slate-100">
             {members.map((member) => (
               <MemberRow
                 key={member.id}

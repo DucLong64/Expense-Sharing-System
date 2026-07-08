@@ -10,7 +10,11 @@ import type { DebtSummaryResponse } from '@/features/settlement/types/settlement
 import { ApiError } from '@/shared/api/api-error'
 import { useToast } from '@/shared/hooks/use-toast'
 
-export function useSettleDebtForm(houseId: string, prefillDebt?: DebtSummaryResponse | null) {
+export function useSettleDebtForm(
+  houseId: string,
+  prefillDebt?: DebtSummaryResponse | null,
+  onSuccess?: () => void,
+) {
   const { showToast } = useToast()
   const { data: debts = [] } = useDebts(houseId)
   const settleMutation = useSettleDebt(houseId)
@@ -22,6 +26,7 @@ export function useSettleDebtForm(houseId: string, prefillDebt?: DebtSummaryResp
 
   useEffect(() => {
     if (!prefillDebt) {
+      form.reset({ toUserId: '', amount: 0, note: '' })
       return
     }
     form.setValue('toUserId', prefillDebt.toUserId)
@@ -37,6 +42,7 @@ export function useSettleDebtForm(houseId: string, prefillDebt?: DebtSummaryResp
       })
       form.reset({ toUserId: '', amount: 0, note: '' })
       showToast('Ghi nhận thanh toán thành công.', 'success')
+      onSuccess?.()
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : 'Không thể ghi nhận thanh toán.'

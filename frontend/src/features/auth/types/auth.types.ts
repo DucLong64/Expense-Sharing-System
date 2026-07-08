@@ -14,3 +14,16 @@ export interface RegisterRequest {
   password: string
   fullName: string
 }
+
+export interface UserResponse {
+  id: string
+  username: string
+  email: string
+  fullName: string
+  createdAt: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}

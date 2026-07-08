@@ -1,23 +1,32 @@
 import { useSettleDebtForm } from '@/features/settlement/hooks/use-settle-debt-form'
 import type { DebtSummaryResponse } from '@/features/settlement/types/settlement.types'
-import { Button } from '@/shared/components/button'
-import { Card } from '@/shared/components/card'
 import { ErrorMessage } from '@/shared/components/error-message'
 import { Input } from '@/shared/components/input'
+import { Modal, ModalActions } from '@/shared/components/modal'
 import { Select } from '@/shared/components/select'
-import { displayUsername } from '@/shared/utils/format'
+import { displayUsername, formatCurrency } from '@/shared/utils/format'
 
-interface SettleDebtFormProps {
+interface SettleDebtModalProps {
+  open: boolean
   houseId: string
   prefillDebt?: DebtSummaryResponse | null
+  onClose: () => void
 }
 
-export function SettleDebtForm({ houseId, prefillDebt }: SettleDebtFormProps) {
-  const { form, onSubmit, isSubmitting, creditorOptions } = useSettleDebtForm(houseId, prefillDebt)
+export function SettleDebtModal({ open, houseId, prefillDebt, onClose }: SettleDebtModalProps) {
+  const { form, onSubmit, isSubmitting, creditorOptions } = useSettleDebtForm(
+    houseId,
+    open ? prefillDebt : null,
+    onClose,
+  )
   const { register, formState } = form
 
+  const description = prefillDebt
+    ? `Thanh toán cho ${displayUsername(prefillDebt.toUsername, prefillDebt.toUserId)} · ${formatCurrency(prefillDebt.amount)}`
+    : 'Xác nhận khi bạn đã trả nợ cho ai đó'
+
   return (
-    <Card title="Ghi nhận thanh toán" description="Xác nhận khi bạn đã trả nợ cho ai đó">
+    <Modal open={open} onClose={onClose} title="Ghi nhận thanh toán" description={description}>
       <form className="space-y-4" onSubmit={onSubmit}>
         <Select
           label="Người nhận"
@@ -38,10 +47,8 @@ export function SettleDebtForm({ houseId, prefillDebt }: SettleDebtFormProps) {
         />
         <Input label="Ghi chú" error={formState.errors.note?.message} {...register('note')} />
         <ErrorMessage message={formState.errors.root?.message} />
-        <Button type="submit" loading={isSubmitting}>
-          Ghi nhận thanh toán
-        </Button>
+        <ModalActions onCancel={onClose} submitLabel="Ghi nhận thanh toán" loading={isSubmitting} />
       </form>
-    </Card>
+    </Modal>
   )
 }

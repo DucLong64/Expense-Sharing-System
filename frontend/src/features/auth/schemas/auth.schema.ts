@@ -23,3 +23,16 @@ export const registerSchema = z.object({
 })
 
 export type RegisterFormValues = z.infer<typeof registerSchema>
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Mật khẩu hiện tại là bắt buộc'),
+    newPassword: z.string().min(8, 'Mật khẩu mới tối thiểu 8 ký tự'),
+    confirmPassword: z.string().min(1, 'Xác nhận mật khẩu là bắt buộc'),
+  })
+  .refine((values) => values.newPassword === values.confirmPassword, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['confirmPassword'],
+  })
+
+export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>

@@ -101,6 +101,8 @@ npm run dev
 
 Frontend chạy tại http://localhost:5173.
 
+**Xuất PDF (Linux/Docker):** đặt font `NotoSans-Regular.ttf` vào `backend/src/main/resources/fonts/` để hỗ trợ tiếng Việt. Trên Windows dev có thể dùng Arial hệ thống làm fallback.
+
 - Dev có thể dùng Vite proxy (`/api` -> backend) hoặc gọi trực tiếp backend nhờ CORS.
 - CORS mặc định cho phép `http://localhost:5173`, chỉnh qua `CORS_ALLOWED_ORIGINS` (phân tách bằng dấu phẩy nếu nhiều origin).
 

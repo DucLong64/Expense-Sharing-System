@@ -1,4 +1,5 @@
 import { useHouseDashboard } from '@/features/dashboard/api/dashboard.query'
+import { useExportHouseReport } from '@/features/report/hooks/use-export-house-report'
 import { Button } from '@/shared/components/button'
 import { Card } from '@/shared/components/card'
 import { ChartIcon, WalletIcon } from '@/shared/components/icons'
@@ -13,6 +14,7 @@ interface DashboardSectionProps {
 
 export function DashboardSection({ houseId }: DashboardSectionProps) {
   const { data, isLoading, error, refetch } = useHouseDashboard(houseId)
+  const { exportReport, isExportingExcel, isExportingPdf } = useExportHouseReport(houseId)
 
   if (isLoading) {
     return <LoadingState message="Đang tải dashboard..." />
@@ -31,6 +33,25 @@ export function DashboardSection({ houseId }: DashboardSectionProps) {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-3">
+        <Button
+          variant="secondary"
+          className="w-auto"
+          loading={isExportingExcel}
+          onClick={() => void exportReport('excel')}
+        >
+          Xuất Excel
+        </Button>
+        <Button
+          variant="secondary"
+          className="w-auto"
+          loading={isExportingPdf}
+          onClick={() => void exportReport('pdf')}
+        >
+          Xuất PDF
+        </Button>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <StatCard
           label="Tổng chi tiêu"

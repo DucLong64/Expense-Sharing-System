@@ -2,6 +2,9 @@ package com.expensesharing.feature.expense.application.usecase;
 
 import com.expensesharing.common.exception.ForbiddenException;
 import com.expensesharing.common.exception.NotFoundException;
+import com.expensesharing.feature.notification.application.service.NotificationService;
+import com.expensesharing.feature.notification.domain.model.NotificationTargetType;
+import com.expensesharing.feature.notification.domain.model.NotificationType;
 import com.expensesharing.feature.activity.application.service.ActivityLogService;
 import com.expensesharing.feature.activity.domain.model.ActivityTargetType;
 import com.expensesharing.feature.activity.domain.model.ActivityType;
@@ -25,6 +28,7 @@ import java.util.List;
 public class UpdateExpenseUseCase {
 
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
     private final ExpenseRepository expenseRepository;
     private final ExpenseParticipantRepository participantRepository;
     private final HouseMemberRepository houseMemberRepository;
@@ -66,6 +70,15 @@ public class UpdateExpenseUseCase {
                 ActivityTargetType.EXPENSE,
                 expense.getId(),
                 "Updated expense: " + expense.getTitle()
+        );
+
+        notificationService.notifyHouseMembersExcept(
+                command.houseId(),
+                command.requesterId(),
+                NotificationType.EXPENSE_UPDATED,
+                "Khoản chi đã được cập nhật: " + expense.getTitle(),
+                NotificationTargetType.EXPENSE,
+                expense.getId()
         );
 
         return new ExpenseResult(expense, participants);

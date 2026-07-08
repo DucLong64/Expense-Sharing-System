@@ -3,6 +3,9 @@ package com.expensesharing.feature.house.application.usecase;
 import com.expensesharing.common.exception.BusinessException;
 import com.expensesharing.common.exception.ForbiddenException;
 import com.expensesharing.common.exception.NotFoundException;
+import com.expensesharing.feature.notification.application.service.NotificationService;
+import com.expensesharing.feature.notification.domain.model.NotificationTargetType;
+import com.expensesharing.feature.notification.domain.model.NotificationType;
 import com.expensesharing.feature.activity.application.service.ActivityLogService;
 import com.expensesharing.feature.activity.domain.model.ActivityTargetType;
 import com.expensesharing.feature.activity.domain.model.ActivityType;
@@ -24,6 +27,7 @@ import java.util.UUID;
 public class InviteMemberUseCase {
 
     private final ActivityLogService activityLogService;
+    private final NotificationService notificationService;
     private final HouseRepository houseRepository;
     private final HouseMemberRepository houseMemberRepository;
     private final UserLookupPort userLookupPort;
@@ -58,6 +62,10 @@ public class InviteMemberUseCase {
 
         HouseMember savedMember = houseMemberRepository.save(newMember);
 
+        String houseName = houseRepository.findById(command.houseId())
+                .map(house -> house.getName())
+                .orElse("nhóm");
+
         activityLogService.log(
                 command.houseId(),
                 command.requesterId(),
@@ -65,6 +73,25 @@ public class InviteMemberUseCase {
                 ActivityTargetType.USER,
                 targetUserId,
                 "Invited a new member to the house."
+        );
+
+        notificationService.notifyUser(
+                targetUserId,
+                command.houseId(),
+                command.requesterId(),
+                NotificationType.MEMBER_INVITED,
+                "Bạn được mời vào nhóm \"" + houseName + "\".",
+                NotificationTargetType.HOUSE,
+                command.houseId()
+        );
+
+        notificationService.notifyHouseMembersExcept(
+                command.houseId(),
+                command.requesterId(),
+                NotificationType.MEMBER_INVITED,
+                "Có thành viên mới tham gia nhóm \"" + houseName + "\".",
+                NotificationTargetType.USER,
+                targetUserId
         );
 
         return savedMember;

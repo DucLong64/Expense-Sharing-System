@@ -2,7 +2,7 @@
 
 > Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch.
 
-**Trạng thái hiện tại:** Phiên bản 1 và 2 đã hoàn thành (Backend + Frontend). Đang hướng tới Phiên bản 3.
+**Trạng thái hiện tại:** Phiên bản 1–2 hoàn thành. Phiên bản 3 đang triển khai (profile, đổi MK, xuất báo cáo đã xong).
 
 ---
 
@@ -36,13 +36,13 @@ Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ
 | Nhật ký hoạt động | ✅ | ✅ | Theo nhóm + toàn bộ của user |
 | Hiển thị username trên UI | ✅ | ✅ | Thay UUID rút gọn |
 | Soft delete | ✅ | — | users, houses, members, expenses |
-| Unit test (Backend) | ✅ | — | ~27 test classes |
+| Unit test (Backend) | ✅ | — | ~29 test classes |
 | Swagger / OpenAPI | ✅ | — | `/swagger-ui.html` |
-| Đổi mật khẩu | ⬜ | ⬜ | Chưa có API |
-| `GET /users/me` (profile) | ⬜ | ⬜ | Chỉ có `/users/me/activities` |
+| `GET /users/me` (profile) | ✅ | ✅ | Trang `/profile` |
+| Đổi mật khẩu | ✅ | ✅ | `PATCH /users/me/password` |
+| Xuất Excel / PDF báo cáo nhóm | ✅ | ✅ | Tab Dashboard |
 | Upload hóa đơn | ⬜ | ⬜ | Phiên bản 3 |
-| Xuất PDF / Excel | ⬜ | ⬜ | Phiên bản 3 |
-| Thông báo | ⬜ | ⬜ | Phiên bản 3 |
+| Thông báo | ✅ | ✅ | In-app, badge chưa đọc |
 | Frontend tests | ⬜ | ⬜ | |
 | Kubernetes / CI/CD | ⬜ | ⬜ | Chỉ có Docker Compose |
 
@@ -60,7 +60,8 @@ Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ
 | Refresh Token | ✅ |
 | Đăng xuất | ✅ |
 | Username không đổi sau đăng ký | ✅ |
-| Đổi mật khẩu | ⬜ |
+| Xem thông tin tài khoản (`GET /users/me`) | ✅ |
+| Đổi mật khẩu | ✅ |
 
 ### 2. Quản lý nhóm
 
@@ -165,6 +166,7 @@ Expense-Sharing-System/
 │           ├── settlement/
 │           ├── dashboard/
 │           └── activity/
+           └── report/
 │   └── src/main/resources/db/migration/   # Flyway V1–V7
 │
 ├── frontend/
@@ -190,6 +192,8 @@ Expense-Sharing-System/
 - Spring Data JPA
 - PostgreSQL + Flyway
 - SpringDoc OpenAPI (Swagger)
+- Apache POI (Excel export)
+- OpenPDF (PDF export)
 - Lombok
 - JUnit 5
 
@@ -209,17 +213,20 @@ Expense-Sharing-System/
 
 ---
 
-## API (25 endpoints)
+## API (33 endpoints)
 
 Base URL: `http://localhost:8080/api/v1`
 
 | Nhóm | Endpoints |
 | ---- | --------- |
 | **Auth** | `POST /auth/register`, `/login`, `/refresh`, `/logout` |
+| **User** | `GET /users/me`, `PATCH /users/me/password` |
 | **House** | `POST/GET/PUT/DELETE /houses`, `GET/POST /houses/{id}/members`, `PUT/DELETE /houses/{id}/members/{userId}`, `DELETE /houses/{id}/members/me` |
 | **Expense** | `POST/GET/PUT/DELETE /houses/{id}/expenses` |
 | **Settlement** | `GET /houses/{id}/debts`, `POST/GET /houses/{id}/settlements` |
 | **Dashboard** | `GET /houses/{id}/dashboard` |
+| **Report** | `GET /houses/{id}/reports/excel`, `GET /houses/{id}/reports/pdf` |
+| **Notification** | `GET /notifications`, `GET /notifications/unread-count`, `PATCH /notifications/{id}/read`, `PATCH /notifications/read-all` |
 | **Activity** | `GET /houses/{id}/activities`, `GET /users/me/activities` |
 
 Tài liệu tương tác: **http://localhost:8080/swagger-ui.html**
@@ -275,7 +282,7 @@ POST /api/v1/houses/{houseId}/members
 | `settlements` | Ghi nhận thanh toán |
 | `activity_logs` | Nhật ký hoạt động |
 
-Migration: `V1` auth → `V2` houses → `V3` expenses → `V4` settlements → `V5` activity → `V6` soft delete → `V7` username
+Migration: `V1` auth → `V2` houses → `V3` expenses → `V4` settlements → `V5` activity → `V6` soft delete → `V7` username → `V8` notifications
 
 ---
 
@@ -318,13 +325,13 @@ cd frontend && npm install && npm run dev
 - Frontend đầy đủ (React + các tab nhóm)
 - Username, soft delete, hiển thị username
 
-### Phiên bản 3 — ⬜ Kế hoạch
+### Phiên bản 3 — 🔄 Đang triển khai
 
-- Upload hóa đơn
-- Xuất PDF / Excel
-- Thông báo
-- Đổi mật khẩu
-- `GET /users/me`
+- ✅ `GET /users/me` + trang profile
+- ✅ Đổi mật khẩu
+- ✅ Xuất Excel / PDF báo cáo nhóm
+- ✅ Thông báo in-app
+- ⬜ Upload hóa đơn
 
 ### Phiên bản 4 — ⬜ Kế hoạch
 

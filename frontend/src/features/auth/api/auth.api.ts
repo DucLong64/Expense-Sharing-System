@@ -2,7 +2,13 @@ import axios from 'axios'
 import { apiRequest } from '@/shared/api/axios-client'
 import type { ApiResponse } from '@/shared/api/api-response.types'
 import { ApiError } from '@/shared/api/api-error'
-import type { AuthResponse, LoginRequest, RegisterRequest } from '@/features/auth/types/auth.types'
+import type {
+  AuthResponse,
+  ChangePasswordRequest,
+  LoginRequest,
+  RegisterRequest,
+  UserResponse,
+} from '@/features/auth/types/auth.types'
 
 const authBaseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
 
@@ -42,5 +48,20 @@ export function logout(refreshTokenValue: string): Promise<void> {
     url: '/api/v1/auth/logout',
     method: 'POST',
     data: { refreshToken: refreshTokenValue },
+  })
+}
+
+export function getMe(): Promise<UserResponse> {
+  return apiRequest<UserResponse>({
+    url: '/api/v1/users/me',
+    method: 'GET',
+  })
+}
+
+export function changePassword(payload: ChangePasswordRequest): Promise<void> {
+  return apiRequest<void>({
+    url: '/api/v1/users/me/password',
+    method: 'PATCH',
+    data: payload,
   })
 }

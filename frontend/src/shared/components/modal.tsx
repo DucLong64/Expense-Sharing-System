@@ -22,7 +22,7 @@ export function Modal({ open, onClose, title, description, children }: ModalProp
         className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
+      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-[var(--shadow-card)]">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
           {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}

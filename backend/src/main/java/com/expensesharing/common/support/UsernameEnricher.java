@@ -12,6 +12,8 @@ import com.expensesharing.feature.expense.application.dto.ExpenseResult;
 import com.expensesharing.feature.expense.domain.model.ExpenseParticipant;
 import com.expensesharing.feature.expense.presentation.response.ExpenseParticipantResponse;
 import com.expensesharing.feature.expense.presentation.response.ExpenseResponse;
+import com.expensesharing.feature.notification.domain.model.Notification;
+import com.expensesharing.feature.notification.presentation.response.NotificationResponse;
 import com.expensesharing.feature.house.domain.model.HouseMember;
 import com.expensesharing.feature.house.presentation.response.HouseMemberResponse;
 import com.expensesharing.feature.settlement.domain.model.DebtSummary;
@@ -154,6 +156,32 @@ public class UsernameEnricher {
                         activity.getTargetId(),
                         activity.getMessage(),
                         activity.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    public NotificationResponse toNotificationResponse(Notification notification) {
+        return toNotificationResponses(List.of(notification)).getFirst();
+    }
+
+    public List<NotificationResponse> toNotificationResponses(List<Notification> notifications) {
+        Set<UUID> userIds = new HashSet<>();
+        notifications.forEach(notification -> userIds.add(notification.getActorUserId()));
+        Map<UUID, String> usernames = loadUsernames(userIds);
+
+        return notifications.stream()
+                .map(notification -> new NotificationResponse(
+                        notification.getId(),
+                        notification.getHouseId(),
+                        notification.getActorUserId(),
+                        username(usernames, notification.getActorUserId()),
+                        notification.getType(),
+                        notification.getMessage(),
+                        notification.getTargetType(),
+                        notification.getTargetId(),
+                        notification.isRead(),
+                        notification.getReadAt(),
+                        notification.getCreatedAt()
                 ))
                 .toList();
     }

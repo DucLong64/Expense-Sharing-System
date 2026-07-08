@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import * as houseApi from '@/features/house/api/house.api'
 import { activityKeys } from '@/features/activity/api/activity.query'
+import { notificationKeys } from '@/features/notification/api/notification.query'
 
 export const houseKeys = {
   all: ['houses'] as const,
@@ -19,6 +20,8 @@ function invalidateHouseQueries(
     queryClient.invalidateQueries({ queryKey: houseKeys.members(houseId) }),
     queryClient.invalidateQueries({ queryKey: activityKeys.house(houseId) }),
     queryClient.invalidateQueries({ queryKey: activityKeys.my() }),
+    queryClient.invalidateQueries({ queryKey: notificationKeys.unreadCount }),
+    queryClient.invalidateQueries({ queryKey: ['notifications'] }),
   ])
 }
 

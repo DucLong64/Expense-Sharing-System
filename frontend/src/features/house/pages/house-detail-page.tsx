@@ -61,7 +61,11 @@ export function HouseDetailPage() {
           {activeTab === 'members' ? <MembersSection houseId={houseId} /> : null}
           {activeTab === 'activities' ? <ActivitySection houseId={houseId} /> : null}
           {activeTab === 'settings' && house ? (
-            <HouseSettingsSection houseId={houseId} onEdit={() => setOpenEditModal(true)} />
+            <HouseSettingsSection
+              houseId={houseId}
+              houseName={house.name}
+              onEdit={() => setOpenEditModal(true)}
+            />
           ) : null}
         </div>
       ) : null}
