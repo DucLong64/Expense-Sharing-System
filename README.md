@@ -1,377 +1,348 @@
 # Hệ thống Quản lý Chi tiêu Chung (Expense Sharing System)
 
-> Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm như nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch.
+> Ứng dụng web giúp quản lý chi tiêu, công nợ và thanh toán giữa các thành viên trong cùng một nhóm nhà trọ, gia đình, nhóm bạn hoặc nhóm du lịch.
+
+**Trạng thái hiện tại:** Phiên bản 1 và 2 đã hoàn thành (Backend + Frontend). Đang hướng tới Phiên bản 3.
 
 ---
 
-# 📖 Giới thiệu
+## Giới thiệu
 
-Trong quá trình sinh hoạt chung, các thành viên thường xuyên phát sinh nhiều khoản chi như:
+Trong quá trình sinh hoạt chung, các thành viên thường xuyên phát sinh nhiều khoản chi như tiền điện, nước, Internet, thuê nhà, mua đồ dùng chung, ăn uống...
 
-* Tiền điện
-* Tiền nước
-* Tiền Internet
-* Tiền thuê nhà
-* Mua đồ dùng chung
-* Ăn uống
-* Các khoản phát sinh khác
+Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ dẫn đến nhầm lẫn. Dự án này giúp:
 
-Việc ghi chép thủ công hoặc nhớ ai đã trả, ai còn nợ rất dễ dẫn đến nhầm lẫn, thất lạc hoặc tranh cãi.
-
-Dự án này được xây dựng nhằm giúp:
-
-* Quản lý các khoản chi một cách minh bạch.
-* Theo dõi công nợ giữa các thành viên.
-* Tự động tính toán số tiền mỗi người phải trả.
-* Hỗ trợ phân quyền người dùng.
-* Dễ dàng mở rộng thành một nền tảng quản lý tài chính nhóm trong tương lai.
+- Quản lý các khoản chi minh bạch
+- Theo dõi công nợ giữa các thành viên
+- Tự động tính số tiền mỗi người phải trả
+- Phân quyền theo vai trò trong nhóm
+- Mở rộng thành nền tảng quản lý tài chính nhóm
 
 ---
 
-# 🎯 Mục tiêu
+## Tiến độ triển khai
 
-* Xây dựng hệ thống theo kiến trúc dễ mở rộng.
-* Áp dụng các best practice của Spring Boot.
-* Phù hợp triển khai thực tế bằng Docker và Kubernetes.
-* Là dự án phục vụ học tập và xây dựng Portfolio Backend Java.
+| Hạng mục | Backend | Frontend | Ghi chú |
+| -------- | ------- | -------- | ------- |
+| Đăng ký / Đăng nhập (username) | ✅ | ✅ | JWT + Refresh Token |
+| Quản lý nhóm (CRUD) | ✅ | ✅ | Soft delete |
+| Quản lý thành viên & phân quyền | ✅ | ✅ | OWNER / ADMIN / MEMBER / VIEWER |
+| Mời thành viên (username/email) | ✅ | ✅ | Nhập chính xác identifier |
+| CRUD khoản chi | ✅ | ✅ | |
+| Chia chi phí (EQUAL / FIXED / %) | ✅ | ✅ | |
+| Tính công nợ & ghi nhận thanh toán | ✅ | ✅ | |
+| Lịch sử thanh toán | ✅ | ✅ | |
+| Dashboard thống kê | ✅ | ✅ | |
+| Nhật ký hoạt động | ✅ | ✅ | Theo nhóm + toàn bộ của user |
+| Hiển thị username trên UI | ✅ | ✅ | Thay UUID rút gọn |
+| Soft delete | ✅ | — | users, houses, members, expenses |
+| Unit test (Backend) | ✅ | — | ~27 test classes |
+| Swagger / OpenAPI | ✅ | — | `/swagger-ui.html` |
+| Đổi mật khẩu | ⬜ | ⬜ | Chưa có API |
+| `GET /users/me` (profile) | ⬜ | ⬜ | Chỉ có `/users/me/activities` |
+| Upload hóa đơn | ⬜ | ⬜ | Phiên bản 3 |
+| Xuất PDF / Excel | ⬜ | ⬜ | Phiên bản 3 |
+| Thông báo | ⬜ | ⬜ | Phiên bản 3 |
+| Frontend tests | ⬜ | ⬜ | |
+| Kubernetes / CI/CD | ⬜ | ⬜ | Chỉ có Docker Compose |
 
 ---
 
-# ✨ Chức năng
+## Chức năng chi tiết
 
-## 1. Quản lý tài khoản
+### 1. Quản lý tài khoản
 
-* Đăng ký
-* Đăng nhập
-* Đổi mật khẩu
-* JWT Authentication
-* Refresh Token
+| Chức năng | Trạng thái |
+| --------- | ---------- |
+| Đăng ký (username, email, password, fullName) | ✅ |
+| Đăng nhập bằng username | ✅ |
+| JWT Authentication | ✅ |
+| Refresh Token | ✅ |
+| Đăng xuất | ✅ |
+| Username không đổi sau đăng ký | ✅ |
+| Đổi mật khẩu | ⬜ |
 
----
+### 2. Quản lý nhóm
 
-## 2. Quản lý nhóm
-
-Một người dùng có thể tham gia nhiều nhóm khác nhau.
-
-Ví dụ:
+Một người dùng có thể tham gia nhiều nhóm:
 
 ```text
 🏠 Phòng trọ Duy Tân
-
 🏠 Gia đình
-
 🏠 Du lịch Đà Nẵng
-
-🏠 Team Company
 ```
 
-Chức năng:
+| Chức năng | Trạng thái |
+| --------- | ---------- |
+| Tạo nhóm | ✅ |
+| Chỉnh sửa thông tin nhóm | ✅ |
+| Mời thành viên (username hoặc email) | ✅ |
+| Đổi vai trò / Xóa thành viên | ✅ |
+| Rời nhóm | ✅ |
+| Xóa nhóm (soft delete, cascade) | ✅ |
 
-* Tạo nhóm
-* Chỉnh sửa thông tin nhóm
-* Mời thành viên
-* Rời nhóm
-* Xóa nhóm
+### 3. Phân quyền thành viên
+
+| Vai trò | Quyền |
+| ------- | ----- |
+| OWNER | Toàn quyền |
+| ADMIN | Quản lý thành viên và khoản chi |
+| MEMBER | Thêm và chỉnh sửa khoản chi của mình |
+| VIEWER | Chỉ được xem |
+
+### 4. Quản lý khoản chi
+
+Mỗi khoản chi gồm: tiêu đề, mô tả, số tiền, người thanh toán, danh sách người tham gia, ngày phát sinh, ghi chú.
+
+Hóa đơn đính kèm: **chưa triển khai** (Phiên bản 3).
+
+### 5. Chia chi phí
+
+| Loại chia | Trạng thái |
+| --------- | ---------- |
+| Chia đều (EQUAL) | ✅ |
+| Chia theo số tiền cố định (FIXED) | ✅ |
+| Chia theo phần trăm (PERCENTAGE) | ✅ |
+| Chia theo trọng số / số ngày ở | ⬜ Tương lai |
+
+### 6. Công nợ & thanh toán
+
+- Tự động tính ai đang nợ ai
+- Ghi nhận thanh toán giữa các thành viên
+- Lịch sử thanh toán
+
+### 7. Nhật ký hoạt động
+
+Ghi lại: thêm/sửa/xóa khoản chi, thanh toán công nợ, thêm/xóa thành viên, thay đổi nhóm...
+
+### 8. Dashboard
+
+- Tổng chi tiêu
+- Tổng đã thanh toán
+- Chi tiêu theo tháng
+- Chi tiêu theo thành viên (hiển thị username)
+- Công nợ hiện tại (trong response API)
+
+### 9. Thông báo (Tương lai)
+
+- Có khoản chi mới
+- Có người thanh toán
+- Nhắc thanh toán
+- Thành viên mới tham gia
 
 ---
 
-## 3. Quản lý thành viên
+## Kiến trúc
 
-Các quyền mặc định:
-
-| Vai trò | Quyền                                |
-| ------- | ------------------------------------ |
-| OWNER   | Toàn quyền                           |
-| ADMIN   | Quản lý thành viên và khoản chi      |
-| MEMBER  | Thêm và chỉnh sửa khoản chi của mình |
-| VIEWER  | Chỉ được xem                         |
-
-Trong tương lai có thể mở rộng thành hệ thống RBAC.
-
----
-
-## 4. Quản lý khoản chi
-
-Mỗi khoản chi gồm:
-
-* Tiêu đề
-* Mô tả
-* Số tiền
-* Người thanh toán
-* Danh sách người tham gia
-* Ngày phát sinh
-* Ghi chú
-* Hóa đơn (phiên bản sau)
-
-Ví dụ:
-
-* Tiền điện tháng 7
-* Tiền Internet
-* Mua gạo
-* Ăn lẩu
-* Mua nước uống
-
----
-
-## 5. Chia chi phí
-
-Hệ thống hỗ trợ nhiều cách chia tiền.
-
-### Chia đều
-
-Ví dụ:
+Áp dụng **Clean Architecture**, **DDD** và **RESTful API**. Mỗi feature tách theo layer:
 
 ```text
-900.000
-
-Long
-Nam
-Huy
-
-=> Mỗi người 300.000
+Presentation  →  Application  →  Domain  →  Infrastructure
 ```
 
-### Chia theo số tiền cố định
-
 ```text
-Long : 500.000
-
-Nam : 300.000
-
-Huy : 100.000
+React (Vite) ──REST──► Spring Boot ──► PostgreSQL
+                            │
+                         Flyway
 ```
 
-### Chia theo phần trăm
+Có thể bổ sung sau: Redis, Message Queue, Object Storage, Kubernetes, Monitoring, CI/CD.
+
+---
+
+## Cấu trúc dự án
 
 ```text
-Long : 50%
-
-Nam : 30%
-
-Huy : 20%
-```
-
-Có thể mở rộng:
-
-* Chia theo trọng số
-* Chia theo số ngày ở
-* Chia theo số lần sử dụng
-
----
-
-## 6. Công nợ
-
-Hệ thống tự động tính:
-
-* Ai đang nợ ai
-* Tổng số tiền còn nợ
-* Lịch sử thanh toán
-
-Ví dụ:
-
-```text
-Long nợ Nam 150.000
-
-Nam nợ Huy 90.000
-```
-
----
-
-## 7. Nhật ký hoạt động
-
-Lưu lại toàn bộ lịch sử thay đổi.
-
-Ví dụ:
-
-* Thêm khoản chi
-* Chỉnh sửa khoản chi
-* Xóa khoản chi
-* Thanh toán công nợ
-* Thêm thành viên
-* Xóa thành viên
-
----
-
-## 8. Thống kê
-
-Dashboard hiển thị:
-
-* Tổng chi tiêu
-* Chi tiêu theo tháng
-* Chi tiêu theo thành viên
-* Công nợ hiện tại
-* Tổng số tiền đã thanh toán
-
----
-
-## 9. Thông báo (Tương lai)
-
-* Có khoản chi mới
-* Có người thanh toán
-* Nhắc thanh toán
-* Thành viên mới tham gia
-
----
-
-# 🏗 Kiến trúc hệ thống
-
-```text
-Frontend
-    │
-REST API
-    │
-Spring Boot
-    │
-Service Layer
-    │
-Repository
-    │
-PostgreSQL
-```
-
-Các thành phần có thể bổ sung sau:
-
-* Redis
-* RabbitMQ / Kafka
-* Object Storage
-* Kubernetes
-* Monitoring
-* CI/CD
-
----
-
-# 📂 Cấu trúc dự án
-
-```text
-expense-sharing/
-
+Expense-Sharing-System/
 ├── backend/
-│   ├── api/
-│   ├── service/
-│   ├── repository/
-│   ├── domain/
-│   ├── security/
-│   ├── common/
-│   └── config/
+│   └── src/main/java/com/expensesharing/
+│       ├── common/              # exception, response, port, support
+│       ├── config/              # Security, ...
+│       └── feature/
+│           ├── auth/            # application / domain / infrastructure / presentation
+│           ├── house/
+│           ├── expense/
+│           ├── settlement/
+│           ├── dashboard/
+│           └── activity/
+│   └── src/main/resources/db/migration/   # Flyway V1–V7
 │
 ├── frontend/
+│   └── src/
+│       ├── app/                 # router, providers
+│       ├── features/            # auth, house, expense, settlement, dashboard, activity
+│       └── shared/              # api, components, hooks, utils
 │
-├── deployment/
-│   ├── docker/
-│   ├── kubernetes/
-│   └── nginx/
-│
-├── docs/
-│
+├── deployment/docker/         # docker-compose.yml (PostgreSQL)
+├── docs/                        # local-development.md
 └── README.md
 ```
 
 ---
 
-# 🛠 Công nghệ sử dụng
+## Công nghệ
 
-## Backend
+### Backend
 
-* Java 21
-* Spring Boot
-* Spring Security
-* Spring Validation
-* Spring Data JPA hoặc MyBatis
-* PostgreSQL
-* Flyway
-* Lombok
+- Java 21
+- Spring Boot 3.3
+- Spring Security + JWT + BCrypt
+- Spring Data JPA
+- PostgreSQL + Flyway
+- SpringDoc OpenAPI (Swagger)
+- Lombok
+- JUnit 5
 
-## Frontend
+### Frontend
 
-* React
-* TypeScript
-* TailwindCSS
-* React Query
+- React 19 + TypeScript
+- Vite 8
+- Tailwind CSS v4
+- TanStack Query (React Query)
+- React Hook Form + Zod
+- Axios + React Router
 
-## Triển khai
+### Triển khai
 
-* Docker
-* Docker Compose
-* Kubernetes
-* Nginx
-
-Có thể mở rộng:
-
-* Harbor
-* Rancher
-* GitHub Actions
-* Jenkins
+- Docker + Docker Compose (PostgreSQL) — **đã có**
+- Kubernetes, Nginx, CI/CD — **chưa có**
 
 ---
 
-# 🗂 Mô hình dữ liệu chính
+## API (25 endpoints)
 
-Các thực thể cốt lõi:
+Base URL: `http://localhost:8080/api/v1`
 
-* User
-* House
-* HouseMember
-* Expense
-* ExpenseParticipant
-* Settlement
-* AuditLog
+| Nhóm | Endpoints |
+| ---- | --------- |
+| **Auth** | `POST /auth/register`, `/login`, `/refresh`, `/logout` |
+| **House** | `POST/GET/PUT/DELETE /houses`, `GET/POST /houses/{id}/members`, `PUT/DELETE /houses/{id}/members/{userId}`, `DELETE /houses/{id}/members/me` |
+| **Expense** | `POST/GET/PUT/DELETE /houses/{id}/expenses` |
+| **Settlement** | `GET /houses/{id}/debts`, `POST/GET /houses/{id}/settlements` |
+| **Dashboard** | `GET /houses/{id}/dashboard` |
+| **Activity** | `GET /houses/{id}/activities`, `GET /users/me/activities` |
 
----
+Tài liệu tương tác: **http://localhost:8080/swagger-ui.html**
 
-# 🚀 Lộ trình phát triển
+### Ví dụ request
 
-## Phiên bản 1
+**Đăng ký:**
 
-* Đăng ký / Đăng nhập
-* Quản lý nhóm
-* CRUD khoản chi
-* Chia đều
-* Tính công nợ
+```json
+POST /api/v1/auth/register
+{
+  "username": "long_dev",
+  "email": "long@example.com",
+  "password": "password123",
+  "fullName": "Nguyen Van Long"
+}
+```
 
-## Phiên bản 2
+**Đăng nhập:**
 
-* Chia theo phần trăm
-* Chia theo số tiền
-* Dashboard
-* Nhật ký hoạt động
+```json
+POST /api/v1/auth/login
+{
+  "username": "long_dev",
+  "password": "password123"
+}
+```
 
-## Phiên bản 3
+**Mời thành viên:**
 
-* Upload hóa đơn
-* Xuất PDF
-* Xuất Excel
-* Thông báo
+```json
+POST /api/v1/houses/{houseId}/members
+{
+  "identifier": "nam_dev",
+  "role": "MEMBER"
+}
+```
 
-## Phiên bản 4
-
-* Ứng dụng di động
-* API công khai
-* WebSocket
-* Đa ngôn ngữ
-
----
-
-# 🎯 Định hướng phát triển
-
-Dự án được thiết kế theo hướng **Domain-Driven Design (DDD)** và **RESTful API**, đảm bảo khả năng mở rộng khi số lượng người dùng và chức năng tăng lên.
-
-Trong tương lai, hệ thống có thể phát triển thành nền tảng quản lý tài chính nhóm dành cho:
-
-* Nhà trọ
-* Gia đình
-* Nhóm bạn
-* Câu lạc bộ
-* Doanh nghiệp nhỏ
-* Nhóm du lịch
+`identifier` có thể là username hoặc email (tự trim, khớp chính xác).
 
 ---
 
-# 📄 Giấy phép
+## Mô hình dữ liệu
+
+| Bảng | Mô tả |
+| ---- | ----- |
+| `users` | Tài khoản (username unique, soft delete) |
+| `refresh_tokens` | Refresh token |
+| `houses` | Nhóm chi tiêu |
+| `house_members` | Thành viên & vai trò |
+| `expenses` | Khoản chi |
+| `expense_participants` | Phần chia của từng thành viên |
+| `settlements` | Ghi nhận thanh toán |
+| `activity_logs` | Nhật ký hoạt động |
+
+Migration: `V1` auth → `V2` houses → `V3` expenses → `V4` settlements → `V5` activity → `V6` soft delete → `V7` username
+
+---
+
+## Chạy local
+
+Xem hướng dẫn chi tiết: [docs/local-development.md](docs/local-development.md)
+
+**Tóm tắt:**
+
+```bash
+# 1. PostgreSQL
+docker compose -f deployment/docker/docker-compose.yml up -d
+
+# 2. Backend (port 8080)
+cd backend && mvn spring-boot:run
+
+# 3. Frontend (port 5173)
+cd frontend && npm install && npm run dev
+```
+
+**Yêu cầu:** Java 21, Maven 3.9+, Node.js 20+, Docker Desktop.
+
+---
+
+## Lộ trình phát triển
+
+### Phiên bản 1 — ✅ Hoàn thành
+
+- Đăng ký / Đăng nhập
+- Quản lý nhóm
+- CRUD khoản chi
+- Chia đều
+- Tính công nợ
+
+### Phiên bản 2 — ✅ Hoàn thành
+
+- Chia theo phần trăm & số tiền cố định
+- Dashboard
+- Nhật ký hoạt động
+- Frontend đầy đủ (React + các tab nhóm)
+- Username, soft delete, hiển thị username
+
+### Phiên bản 3 — ⬜ Kế hoạch
+
+- Upload hóa đơn
+- Xuất PDF / Excel
+- Thông báo
+- Đổi mật khẩu
+- `GET /users/me`
+
+### Phiên bản 4 — ⬜ Kế hoạch
+
+- Ứng dụng di động
+- API công khai
+- WebSocket
+- Đa ngôn ngữ
+
+---
+
+## Định hướng
+
+Dự án hướng tới nền tảng quản lý tài chính nhóm cho nhà trọ, gia đình, nhóm bạn, câu lạc bộ, doanh nghiệp nhỏ, nhóm du lịch.
+
+Phục vụ học tập, nghiên cứu và xây dựng Portfolio **Java Backend Developer**, đồng thời hướng tới triển khai thực tế trong môi trường doanh nghiệp.
+
+---
+
+## Giấy phép
 
 MIT License
-
----
-
-# 👨‍💻 Tác giả
-
-Dự án được phát triển nhằm mục đích học tập, nghiên cứu và xây dựng Portfolio cho vị trí **Java Backend Developer**, đồng thời hướng tới khả năng triển khai thực tế trong môi trường doanh nghiệp.

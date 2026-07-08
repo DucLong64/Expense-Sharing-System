@@ -1,0 +1,24 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/expense_sharing
+    username: postgres
+    password: postgres
+
+  jpa:
+    show-sql: true
+
+jwt:
+  secret: local-dev-jwt-secret-key-must-be-at-least-256-bits-long-for-hs256
+
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+
+logging:
+  level:
+    com.expensesharing: DEBUG

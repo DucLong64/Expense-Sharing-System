@@ -1,3 +1,4 @@
+# Maven
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -10,8 +11,42 @@ buildNumber.properties
 # https://maven.apache.org/tools/wrapper/#Usage_with_or_without_Binary_JAR
 .mvn/wrapper/maven-wrapper.jar
 
-# Eclipse m2e generated files
-# Eclipse Core
+# Eclipse
 .project
-# JDT-specific (Eclipse Java Development Tools)
 .classpath
+.settings/
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local / secrets
+.env
+.env.*
+application-local.yml
+application-*.local.yml
+
+# Frontend
+node_modules/
+dist/
+build/
+.vite/
+frontend/.env
+
+# Java
+*.class
+
+# AI Agent
+.amazonq
+.cursor
