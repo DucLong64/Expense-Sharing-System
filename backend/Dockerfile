@@ -19,4 +19,6 @@ COPY --from=build /app/target/*.jar app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV JAVA_OPTS="-Xms128m -Xmx400m -XX:+UseSerialGC"
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

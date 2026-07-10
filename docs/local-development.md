@@ -1,6 +1,7 @@
 # Chạy Backend Local
 
-> Deploy cho nhiều người dùng: xem [deployment.md](deployment.md).
+> Deploy free (Vercel + Render + Neon): xem [deploy-free.md](deploy-free.md).
+> Deploy VPS Docker: xem [deployment.md](deployment.md).
 
 ## Yêu cầu
 
